@@ -1,0 +1,11 @@
+@import "tailwindcss";
+:root {
+  --primaryColor: #5f35f5;
+  --authFontColor: #11175d;
+  --orangeColor: #ea6c00;
+}
+@theme {
+  --color-primaryColor: var(--primaryColor);
+  --color-authFontColor: var(--authFontColor);
+  --color-orangeColor: var(--orangeColor);
+}
