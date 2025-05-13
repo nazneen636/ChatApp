@@ -1,4 +1,5 @@
 import { Bounce, Slide, toast } from "react-toastify";
+import moment from "moment";
 
 const _ = {};
 _.SignUpData = () => {
@@ -21,9 +22,9 @@ _.SignUpData = () => {
   ];
   return signUpItem;
 };
-_.SuccessToast = (msg = "success message missing") => {
+_.SuccessToast = (msg = "success message missing", position = "top-right") => {
   toast.success(msg, {
-    position: "bottom-right",
+    position: position,
     autoClose: 3000,
     hideProgressBar: false,
     closeOnClick: false,
@@ -61,4 +62,8 @@ _.ErrorToast = (msg = "success message missing") => {
   });
 };
 
+// time and date
+_.GetTimeNow = () => {
+  return moment().format("dddd, MMMM Do YYYY, h:mm:ss a");
+};
 export default _;

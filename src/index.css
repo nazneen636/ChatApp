@@ -3,9 +3,55 @@
   --primaryColor: #5f35f5;
   --authFontColor: #11175d;
   --orangeColor: #ea6c00;
+  --grayColor: #4d4d4d;
 }
 @theme {
   --color-primaryColor: var(--primaryColor);
   --color-authFontColor: var(--authFontColor);
   --color-orangeColor: var(--orangeColor);
+  --color-grayColor: var(--grayColor);
+}
+.active {
+  width: 80%;
+  display: block;
+  background-color: white;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  position: relative;
+  color: var(--primaryColor);
+  display: flex;
+  justify-content: center;
+  font-size: 30px;
+}
+.active::after {
+  position: absolute;
+  content: "";
+  height: 100%;
+  width: 8px;
+  background-color: var(--primaryColor);
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
+  right: 0;
+  top: 0;
+}
+/* custom scrollbar */
+.customScroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+.customScroll::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 10px;
+}
+
+/* Handle */
+.customScroll::-webkit-scrollbar-thumb {
+  background: var(--primaryColor);
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+.customScroll::-webkit-scrollbar-thumb:hover {
+  background: #b30000;
 }

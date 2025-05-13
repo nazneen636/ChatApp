@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import image from "../../assets/signUp.png";
 import lib from "../../lib/lib";
 import { ClipLoader, FadeLoader } from "react-spinners";
 import { Link } from "react-router";
+import { getDatabase, push, ref, set } from "firebase/database";
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -15,10 +16,14 @@ const override = {
   margin: "0 auto",
   borderColor: "red",
 };
+
 const SignUp = () => {
+  useEffect(() => {
+    console.log("hello");
+  }, []);
   let [loading, setLoading] = useState(false);
   const auth = getAuth();
-
+  const db = getDatabase();
   const data = lib.SignUpData();
   const { SuccessToast, InfoToast, ErrorToast } = lib;
 
@@ -64,10 +69,22 @@ const SignUp = () => {
           });
         })
         .then(() => {
+          const userdb = ref(db, "users/");
+          set(push(userdb), {
+            userid: auth.currentUser.uid,
+            username: auth.currentUser.displayName || fullName,
+            email: auth.currentUser.email || email,
+            profile_picture:
+              auth.currentUser.photoURL ||
+              "https://img.freepik.com/free-vector/gradient-product-manager-linkedin-profile-picture_742173-7162.jpg?t=st=1746982998~exp=1746986598~hmac=a96833ed2bff144a914d65c126a82d15c8b7f0c2d00bdfea0670ca60ed7abb0c&w=740",
+          });
           return sendEmailVerification(auth.currentUser);
         })
         .then((mailData) => InfoToast("Mail verified successfully"))
-        .catch((err) => ErrorToast("Registration failed:", err.code))
+        .catch((err) => {
+          ErrorToast("Registration failed:", err.code);
+          console.log(err);
+        })
         .finally(() => {
           setLoading(false);
           setEmail("");

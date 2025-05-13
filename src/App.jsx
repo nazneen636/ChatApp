@@ -1,10 +1,10 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
-import RootLayout from "./components/RootLayout";
-// import Home from "./pages/home/Home";
-import SignIn from "./pages/signin";
 import SignUp from "./pages/signup";
 import Home from "./pages/home";
+import Chat from "./pages/Chat/chat";
+import RootLayout from "./components/HomeComponent/RootLayout";
+import SignIn from "./pages/signin";
 
 const App = () => {
   return (
@@ -13,9 +13,11 @@ const App = () => {
         <Routes>
           <Route path="/" element={<RootLayout />}>
             <Route index element={<Home />} />
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/signup" element={<SignUp />} />
+            <Route path="/chat" element={<Chat />} />
+            <Route path="/notification" element={"Notification"} />
           </Route>
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
         </Routes>
       </BrowserRouter>
     </div>
