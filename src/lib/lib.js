@@ -64,6 +64,6 @@ _.ErrorToast = (msg = "success message missing") => {
 
 // time and date
 _.GetTimeNow = () => {
-  return moment().format("dddd, MMMM Do YYYY, h:mm:ss a");
+  return moment().format("MM, DD, YYYY, h:mm:ss a");
 };
 export default _;

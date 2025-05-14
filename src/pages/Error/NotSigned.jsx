@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router";
 const NotSignedIn = () => {
   return (
     <main className="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
@@ -17,9 +18,9 @@ const NotSignedIn = () => {
           >
             Go to Sign in
           </a>
-          <a href="#" className="text-sm font-semibold text-gray-900">
+          <Link to="/signin" className="text-sm font-semibold text-gray-900">
             Contact support <span aria-hidden="true">&rarr;</span>
-          </a>
+          </Link>
         </div>
       </div>
     </main>

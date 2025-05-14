@@ -5,13 +5,15 @@ import { getDatabase, ref, onValue, set, push, off } from "firebase/database";
 import { getAuth } from "firebase/auth";
 import { UserListSkeleton } from "../Skeleton/UserList";
 import lib from "../../lib/lib";
-import { FaMinus, FaPlus } from "react-icons/fa6";
+import { FaMinus, FaPlus, FaUser } from "react-icons/fa6";
+import Alert from "../commonComponent/Alert";
 
 const UserList = () => {
   const auth = getAuth();
   const db = getDatabase();
   const [userList, setUserList] = useState([]);
   const [friendRequestList, setFriendRequestList] = useState([]);
+  const [actualFriendList, setActualFriendList] = useState([]);
   const [currentUser, setCurrentUser] = useState({});
   const [loading, setLoading] = useState(false);
   const [sendRequest, setSendRequest] = useState([]);
@@ -41,20 +43,48 @@ const UserList = () => {
     };
   }, []);
 
+  // fetch data if friend
+  useEffect(() => {
+    const frRef = ref(db, "friends/");
+    const frArr = [];
+
+    onValue(frRef, (snapshot) => {
+      snapshot.forEach((singleFr) => {
+        const senderId = singleFr.val().whoSendFriendRequestUid;
+        const receiverId = singleFr.val().whoReceiveFriendRequestUid;
+
+        const id1 = senderId + receiverId;
+        const id2 = receiverId + senderId;
+
+        frArr.push(id1, id2); // Both combinations
+      });
+
+      setActualFriendList(frArr);
+    });
+
+    return () => off(frRef);
+  }, []);
+
+  // fetch data from friend request
   useEffect(() => {
     const friendRequestArr = [];
     const friendRequestRef = ref(db, "friendRequest/");
     onValue(friendRequestRef, (snapshot) => {
       snapshot.forEach((fr) => {
-        friendRequestArr.push(fr.val());
+        if (auth.currentUser.uid == fr.val().whoSendFriendRequestUid)
+          friendRequestArr.push(
+            auth?.currentUser?.uid.concat(fr.val().whoReceiveFriendRequestUid)
+          );
       });
       setFriendRequestList(friendRequestArr);
-      console.log(friendRequestArr, "FR Arr");
     });
+
+    return () => off(friendRequestRef);
   }, []);
+  console.log(actualFriendList);
+
   // handle friend request
   const handleFriendRequest = (user) => {
-    console.log(user);
     set(push(ref(db, "friendRequest/")), {
       whoSendFriendRequestName:
         currentUser?.username || auth?.currentUser?.displayName,
@@ -86,22 +116,9 @@ const UserList = () => {
           "bottom-right"
         );
       })
-      .then(() => {
-        console.log("last chain");
-
-        // const senderReceiverId = {
-        //   id: currentUser?.userid + user?.userid,
-        // };
-        // localStorage.setItem("sendFr", JSON.stringify(senderReceiverId));
-      })
       .catch((err) => console.error("Error from friend request", err));
     setSendRequest(true);
   };
-
-  // get data from localStorage
-  // const frData = localStorage.getItem("sendFr");
-  // const sendReceiverId = JSON.parse(frData);
-  // console.log(JSON.parse(frData));
 
   let content = null;
   if (loading) {
@@ -116,39 +133,60 @@ const UserList = () => {
           <BsThreeDotsVertical className="text-primaryColor text-lg" />
         </div>
         <div className="overflow-y-scroll customScroll h-[40dvh] mt-4 px-1">
-          {userList?.map((user, index) => (
-            <div
-              className={
-                userList - 1 == index
-                  ? "flex items-center gap-4 pb-1"
-                  : "flex items-center gap-4 border-b border-b-gray-300 py-2"
-              }
-            >
-              <div className="w-[50px] h-[50px] rounded-full  cursor-pointer bg-white">
-                <picture>
-                  <img
-                    src={user?.profile_picture || avatar}
-                    alt=""
-                    className="h-full w-full rounded-full object-cover"
-                  />
-                </picture>
-              </div>
-              <div className="w-[40%]">
-                <h2 className="font-semibold text-lg text-black">
-                  {user?.username}
-                </h2>
-                <p className="text-grayColor text-sm font-medium">
-                  Hi Guys, Wassup!
-                </p>
-              </div>
-              <button
-                onClick={() => handleFriendRequest(user)}
-                className="bg-primaryColor px-4 py-2 text-white rounded-[5px] font-semibold text-xl ml-10 cursor-pointer"
+          {userList.length >= 1 ? (
+            userList?.map((user, index) => (
+              <div
+                className={
+                  userList.length - 1 == index
+                    ? "flex items-center gap-4 pb-1"
+                    : "flex items-center gap-4 border-b border-b-gray-300 py-2"
+                }
               >
-                <FaPlus />
-              </button>
-            </div>
-          ))}
+                <div className="w-[50px] h-[50px] rounded-full  cursor-pointer bg-white">
+                  <picture>
+                    <img
+                      src={user?.profile_picture || avatar}
+                      alt=""
+                      className="h-full w-full rounded-full object-cover"
+                    />
+                  </picture>
+                </div>
+                <div className="w-[40%]">
+                  <h2 className="font-semibold text-lg text-black">
+                    {user?.username}
+                  </h2>
+                  <p className="text-grayColor text-sm font-medium">
+                    {user?.email || "email"}
+                  </p>
+                </div>
+                {actualFriendList.includes(
+                  auth?.currentUser?.uid.concat(user?.userid)
+                ) ||
+                actualFriendList.includes(
+                  user?.userid.concat(auth?.currentUser?.uid)
+                ) ? (
+                  <button className="bg-primaryColor px-4 py-2 text-white rounded-[5px] font-semibold text-xl ml-10 cursor-pointer">
+                    <FaUser />
+                  </button>
+                ) : friendRequestList.includes(
+                    auth?.currentUser?.uid.concat(user?.userid)
+                  ) ? (
+                  <button className="bg-primaryColor px-4 py-2 text-white rounded-[5px] font-semibold text-xl ml-10 cursor-pointer">
+                    <FaMinus />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleFriendRequest(user)}
+                    className="bg-primaryColor px-4 py-2 text-white rounded-[5px] font-semibold text-xl ml-10 cursor-pointer"
+                  >
+                    <FaPlus />
+                  </button>
+                )}
+              </div>
+            ))
+          ) : (
+            <Alert />
+          )}
         </div>
       </div>
     );
