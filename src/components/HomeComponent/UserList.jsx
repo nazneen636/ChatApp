@@ -17,6 +17,7 @@ const UserList = () => {
   const [currentUser, setCurrentUser] = useState({});
   const [loading, setLoading] = useState(false);
   const [sendRequest, setSendRequest] = useState([]);
+  const [blockUser, setBlockUser] = useState([]);
 
   useEffect(() => {
     const userRef = ref(db, "users/");
@@ -165,14 +166,32 @@ const UserList = () => {
                 actualFriendList.includes(
                   user?.userid.concat(auth?.currentUser?.uid)
                 ) ? (
-                  <button className="bg-primaryColor px-4 py-2 text-white rounded-[5px] font-semibold text-xl ml-10 cursor-pointer">
+                  <button
+                    type="button"
+                    className="bg-primaryColor px-4 py-2 text-white rounded-[5px] font-semibold text-xl ml-10 cursor-pointer"
+                  >
                     <FaUser />
                   </button>
                 ) : friendRequestList.includes(
                     auth?.currentUser?.uid.concat(user?.userid)
                   ) ? (
-                  <button className="bg-primaryColor px-4 py-2 text-white rounded-[5px] font-semibold text-xl ml-10 cursor-pointer">
+                  <button
+                    type="button"
+                    className="bg-primaryColor px-4 py-2 text-white rounded-[5px] font-semibold text-xl ml-10 cursor-pointer"
+                  >
                     <FaMinus />
+                  </button>
+                ) : blockUser.includes(
+                    auth?.currentUser?.uid?.concat(user?.userid) ||
+                      blockUser.includes(
+                        user?.userid.concat(auth?.currentUser?.uid)
+                      )
+                  ) ? (
+                  <button
+                    type="button"
+                    className="bg-red-600 focus-ring-white px-4 py-1 text-white rounded-[5px] font-semibold text-lg"
+                  >
+                    Blocked
                   </button>
                 ) : (
                   <button

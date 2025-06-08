@@ -2,7 +2,15 @@ import React, { useEffect, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import avatar from "../../assets/home/avatar.png";
 import lib from "../../lib/lib";
-import { getDatabase, ref, onValue, off, set, push } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  off,
+  set,
+  push,
+  remove,
+} from "firebase/database";
 import { getAuth } from "firebase/auth";
 import moment from "moment";
 import { FriendListSkeleton } from "../Skeleton/FriendListSkeleton";
@@ -13,8 +21,11 @@ const Friends = () => {
   const auth = getAuth();
 
   const [friendList, setFriendList] = useState([]);
+  const [block, setBlock] = useState(false);
+  const [blockList, setBlockList] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // fetch friend list
   useEffect(() => {
     const friendRef = ref(db, "friends/");
     const friendArr = [];
@@ -30,6 +41,38 @@ const Friends = () => {
     return () => off(friendRef);
   }, []);
   console.log(friendList, "ff");
+
+  //  fetch blocklist data
+  useEffect(() => {
+    const BlockRef = ref(db, "blockList/");
+    const blockArr = [];
+    onValue(BlockRef, (snapshot) => {
+      snapshot.forEach((block) => {
+        if (auth.currentUser.uid == block.val().whoReceiveFriendRequestUid) {
+          blockArr.push(
+            auth?.currentUser?.uid.concat(block.val()?.whoSendFriendRequestUid)
+          );
+        }
+      });
+      setBlockList(blockArr);
+      setLoading(false);
+    });
+  }, []);
+
+  // handle block function
+  const handleBlock = (frInfo = {}) => {
+    setBlock((prev) => {
+      return !prev;
+    });
+    push(ref(db, "blockList/"), {
+      ...frInfo,
+      createdAt: lib.GetTimeNow(),
+    }).then(() => {
+      const frRef = ref(db, `friends/${frInfo.friendKey}`);
+      remove(frRef);
+    });
+  };
+  console.log(block);
 
   let content = null;
   if (loading) {
@@ -69,12 +112,28 @@ const Friends = () => {
                       {fr?.whoSendFriendRequestName || "name missing"}
                     </h2>
                     <p className="text-grayColor text-sm font-medium">
-                      Dinner?
+                      {moment(fr.createdAt).fromNow()}
                     </p>
                   </div>
-                  <p className="ml-10 opacity-90 text-grayColor text-sm font-medium">
-                    {moment(fr.createdAt).fromNow()}
-                  </p>
+                  <div className="flex gap-1">
+                    <button className="bg-primaryColor px-4 py-1 text-white rounded-[5px] font-semibold text-lg">
+                      Unfriend
+                    </button>
+                    {blockList.includes(
+                      auth.currentUser.uid.concat(fr.whoSendFriendRequestUid)
+                    ) ? (
+                      ""
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleBlock(fr)}
+                        className="bg-red-600 focus-ring-white px-4 py-1 text-white rounded-[5px] font-semibold text-lg"
+                      >
+                        {" "}
+                        Block
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))
             ) : (
