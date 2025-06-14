@@ -1,7 +1,8 @@
 import React from "react";
 import GroupList from "../../components/HomeComponent/GroupList";
 import Friends from "../../components/HomeComponent/Friends";
-import Message from "../../components/chat/message";
+import Message from "../../components/chat/Message";
+
 
 const Chat = () => {
   return (
@@ -11,10 +12,11 @@ const Chat = () => {
           <GroupList />
         </div>
         <div className=" h-[48dvh]">
-          <Friends />
+          <Friends buttonVisible={true} />
         </div>
       </div>
-      <div className="bg-gray-100 rounded-[20px] p-5 col-span-2 h-full">
+      {/* <div className="bg-red-300 h-full"></div> */}
+      <div className=" rounded-[20px] col-span-2 h-full">
         <Message />
       </div>
     </div>

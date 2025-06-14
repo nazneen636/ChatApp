@@ -27,9 +27,9 @@ const RootLayout = () => {
   let content = null;
   if (isVerified) {
     content = (
-      <div className="h-screen p-5 flex gap-4">
+      <div className="h-[95dvh] flex gap-4">
         <Sidebar />
-        <div className=" rounded-[20px] w-full h-[95dvh]">
+        <div className="rounded-[20px] w-full ">
           <Outlet />
         </div>
       </div>

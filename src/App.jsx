@@ -6,6 +6,7 @@ import Home from "./pages/home";
 import RootLayout from "./components/HomeComponent/RootLayout";
 import SignIn from "./pages/signin";
 import Message from "./components/chat/Message";
+import Chat from "./pages/Chat/Chat";
 
 const App = () => {
   return (
@@ -14,7 +15,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<RootLayout />}>
             <Route index element={<Home />} />
-            <Route path="/chat" element={<Message />} />
+            <Route path="/chat" element={<Chat />} />
             <Route path="/notification" element={"Notification"} />
           </Route>
           <Route path="/signin" element={<SignIn />} />

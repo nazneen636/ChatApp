@@ -89,7 +89,7 @@ const FriendRequest = () => {
     content = (
       <div>
         <div>
-          <div className="shadow-lg rounded-[20px] border border-red-300 p-5 h-[47dvh]">
+          <div className="shadow-lg rounded-[20px] border border-red-300 p-5 h-[43dvh]">
             <div className="flex justify-between items-center mb-4 h-[2dvh]">
               <h1 className="font-semibold text-xl">
                 Friend Request{" "}
@@ -99,7 +99,7 @@ const FriendRequest = () => {
               </h1>
               <BsThreeDotsVertical className="text-primaryColor text-lg" />
             </div>
-            <div className="overflow-y-scroll customScroll h-[40dvh] mt-4">
+            <div className="overflow-y-scroll customScroll h-[35dvh] mt-4">
               {friendRequestList.length >= 1 ? (
                 friendRequestList?.map((fr, index) => (
                   <div

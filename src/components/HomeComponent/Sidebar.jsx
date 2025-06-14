@@ -122,7 +122,7 @@ const Sidebar = () => {
   // console.log(auth.currentUser.displayName, "auth profile");
 
   return (
-    <div className="w-[150px] h-[95dvh] rounded-[20px] bg-primaryColor flex flex-col items-center">
+    <div className="w-[150px] h-full rounded-[20px] bg-primaryColor flex flex-col items-center">
       {/* profile */}
       <div className="flex flex-col items-center justify-center">
         <div

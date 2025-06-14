@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import avatar from "../../assets/home/avatar.png";
 import lib from "../../lib/lib";
+import { friendAction } from "../../Features/Slices/friendSlice";
 import {
   getDatabase,
   ref,
@@ -15,8 +16,9 @@ import { getAuth } from "firebase/auth";
 import moment from "moment";
 import { FriendListSkeleton } from "../Skeleton/FriendListSkeleton";
 import Alert from "../commonComponent/Alert";
+import { useDispatch, useSelector } from "react-redux";
 
-const Friends = () => {
+const Friends = ({ buttonVisible = false }) => {
   const db = getDatabase();
   const auth = getAuth();
 
@@ -25,13 +27,18 @@ const Friends = () => {
   const [blockList, setBlockList] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const dispatch = useDispatch();
+
   // fetch friend list
   useEffect(() => {
     const friendRef = ref(db, "friends/");
     const friendArr = [];
     onValue(friendRef, (snapshot) => {
       snapshot.forEach((friend) => {
-        if (auth?.currentUser?.uid == friend.val().whoReceiveFriendRequestUid) {
+        if (
+          auth?.currentUser?.uid === friend.val().whoReceiveFriendRequestUid ||
+          auth?.currentUser?.uid === friend.val().whoSendFriendRequestUid
+        ) {
           friendArr.push({ ...friend.val(), friendKey: friend.key });
         }
       });
@@ -72,7 +79,30 @@ const Friends = () => {
       remove(frRef);
     });
   };
-  console.log(block);
+  const SendMsg = (frInfo) => {
+    console.log("sending", frInfo);
+    if (frInfo?.whoSendFriendRequestUid == auth.currentUser.uid) {
+      let userInfo = {
+        userUid: frInfo.whoReceiveFriendRequestUid,
+        userKey: frInfo.whoReceiveFriendRequestKey,
+        userName: frInfo.whoReceiveFriendRequestName,
+        userEmail: frInfo.whoReceiveFriendRequestEmail,
+        userProfile_picture: frInfo.whoReceiveFriendRequestProfile_picture,
+      };
+      dispatch(friendAction(userInfo));
+    } else {
+      let userInfo = {
+        userUid: frInfo.whoSendFriendRequestUid,
+        userKey: frInfo.whoSendFriendRequestKey,
+        userName: frInfo.whoSendFriendRequestName,
+        userEmail: frInfo.whoSendFriendRequestEmail,
+        userProfile_picture: frInfo.whoSendFriendRequestProfile_picture,
+      };
+
+      dispatch(friendAction(userInfo));
+      console.log(userInfo, "userInfo");
+    }
+  };
 
   let content = null;
   if (loading) {
@@ -92,6 +122,7 @@ const Friends = () => {
             {friendList.length > 0 ? (
               friendList?.map((fr, index) => (
                 <div
+                  onClick={() => SendMsg(fr)}
                   className={
                     friendList.length - 1 == index
                       ? "flex items-center gap-4 pb-1"
@@ -115,25 +146,36 @@ const Friends = () => {
                       {moment(fr.createdAt).fromNow()}
                     </p>
                   </div>
-                  <div className="flex gap-1">
-                    <button className="bg-primaryColor px-4 py-1 text-white rounded-[5px] font-semibold text-lg">
-                      Unfriend
+                  {buttonVisible ? (
+                    <button
+                      type="button"
+                      onClick={() => SendMsg(fr)}
+                      className="bg-purple-600 focus-ring-white px-4 py-1 text-white rounded-[5px] font-semibold text-lg"
+                    >
+                      {" "}
+                      Send Message
                     </button>
-                    {blockList.includes(
-                      auth.currentUser.uid.concat(fr.whoSendFriendRequestUid)
-                    ) ? (
-                      ""
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => handleBlock(fr)}
-                        className="bg-red-600 focus-ring-white px-4 py-1 text-white rounded-[5px] font-semibold text-lg"
-                      >
-                        {" "}
-                        Block
+                  ) : (
+                    <div className="flex gap-1">
+                      <button className="bg-primaryColor px-4 py-1 text-white rounded-[5px] font-semibold text-lg">
+                        Unfriend
                       </button>
-                    )}
-                  </div>
+                      {blockList.includes(
+                        auth.currentUser.uid.concat(fr.whoSendFriendRequestUid)
+                      ) ? (
+                        ""
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleBlock(fr)}
+                          className="bg-red-600 focus-ring-white px-4 py-1 text-white rounded-[5px] font-semibold text-lg"
+                        >
+                          {" "}
+                          Block
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))
             ) : (

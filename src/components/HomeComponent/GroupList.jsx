@@ -133,7 +133,7 @@ const GroupList = () => {
     setIsOpen(false);
   };
   return (
-    <div className="h-[50dvh]">
+    <div className="h-[40dvh]">
       {/* search bar */}
       <div className="w-full shadow-lg  rounded-[20px] py-2 px-5 mb-2 flex items-center justify-between ">
         <HiMiniMagnifyingGlass className="text-lg" />
@@ -160,7 +160,7 @@ const GroupList = () => {
           <FaPlus /> Create Group
         </button>
 
-        <div className="overflow-y-scroll customScroll h-[30dvh] pb-1">
+        <div className="overflow-y-scroll customScroll h-[26dvh] pb-1">
           {[...new Array(arrLength)].map((_, index) => (
             <div
               className={
@@ -195,7 +195,6 @@ const GroupList = () => {
 
         {/* modal open */}
         <div>
-          <button onClick={openModal}>Open Modal</button>
           <Modal
             isOpen={modalIsOpen}
             onRequestClose={closeModal}
